@@ -141,6 +141,7 @@ $(document).ready(function() {
 
   function update_repo(repo, repo_state) {
     repo.commits_ahead = repo_state.ahead_by;
+    repo.oldest_commit = repo.commits_ahead ? repo_state.commits[0].commit.author.date : null;
 
     var mergeCommits = repo_state.commits.filter(function(commit) {
       return commit.parents.length > 1;
@@ -198,10 +199,12 @@ $(document).ready(function() {
       var diff_text = repo.commits_ahead + ' <small>' + message + '</small>';
     }
 
+    var oldest_merge_or_commit = repo.oldest_merge || repo.oldest_commit || null;
+
     repo.$el.attr('class', repo_state(repo));
     repo.$el.find('.diff').html(diff_text);
     repo.$el.find('.name a').attr('href', repo.http_compare_url);
-    repo.$el.find('.time').text(repo.oldest_merge ? prettyDate(repo.oldest_merge) : 'all deployed');
+    repo.$el.find('.time').text(oldest_merge_or_commit ? prettyDate(oldest_merge_or_commit) : 'all deployed');
 
     // TODO: Don't resort the entire list when a single repo updates.
     sort_repos();
